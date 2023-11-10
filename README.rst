@@ -34,10 +34,23 @@ mlrep
 =====
 
 
+
     Add a short description here!
 
 
 A longer description of your project goes here...
+
+=====
+Install
+=====
+#verison 1.9 of tyghtning due to parsing issues
+
+```
+mamba create -n mlrep pytorch-lightning=1.9 pytorch tqdm pandas
+mamba activate mlrep
+pip install -e ./
+
+```
 
 
 .. _pyscaffold-notes:
