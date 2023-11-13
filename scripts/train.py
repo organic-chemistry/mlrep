@@ -53,9 +53,6 @@ validation_chromosomes = ["chr2"]
 
 result_chromosomes = [f"chr{i}" for i in range(1,23)]
 
-training_chromosomes = ["chr1"]
-result_chromosomes = ["chr1"]
-
 
 #####################################################
 #create the iterator by chromosome on the data
