@@ -32,7 +32,7 @@ It with create a log directory in test/lightning_logs/version_1/ with version ch
 Inside you can find the metrics, the parameters as well as the checkpoints and the prediction of the model
 There is an example [notebook](notebook/check_results.ipynb) to view the results and the loss Notebook Link 
 
-##Running the test
+## Running the test
 I implemented some test for the iterators
 You can run them like that:
 ```
