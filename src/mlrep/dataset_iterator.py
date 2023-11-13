@@ -40,12 +40,13 @@ class GenomeDataset:
         if self.pad:
             extra = 0
         else:
-            extra = self.window_size
+            extra = self.window_size - 1
 
         for i in range(len(inputs) - extra):
             input_seq = self.view(inputs,[i,i + self.window_size])
             target_output = outputs[i + extra//2]
-            if np.sum(np.isnan(target_output)) !=0 and self.skip_if_nan:
+            #print(np.sum(np.isnan(target_output)) , np.sum(np.isnan(input_seq)) ,self.skip_if_nan)
+            if (np.sum(np.isnan(target_output)) !=0 or np.sum(np.isnan(input_seq)) != 0 )  and self.skip_if_nan:
                 continue
             yield self.transform_input(input_seq), self.transform_output(target_output)
 

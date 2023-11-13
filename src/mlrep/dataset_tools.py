@@ -98,6 +98,10 @@ def get_padded_view(arr,index_slice,pad_length,pad_value=0):
     
     len_arr = len(arr)
 
+    if start < 0 or end < 0 :
+        print("Negative index not supported")
+        raise
+
     assert(end<= len_arr + 2* pad_length)
     
     
@@ -126,7 +130,7 @@ def get_padded_view(arr,index_slice,pad_length,pad_value=0):
 
     if  extra_r>0 :
         if pad_dim == 1:
-            right = np.zeros(extra_r)
+            right = np.zeros(extra_r,dtype=dtype)
         else:
             right = np.zeros([extra_r]+pad_shape[1:],dtype=dtype)
         
