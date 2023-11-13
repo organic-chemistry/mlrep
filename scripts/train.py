@@ -137,7 +137,9 @@ trainer.fit(model=lightning_model, train_dataloaders=data_train,
 # Then compute on all chromosomes for each file
 # this could be put into on another script
 
-result_root = os.path.join(trainer.log_dir, 'lightning_logs', f'version_{trainer.logger.version}')
+result_root = trainer.log_dir
+if f'version_{trainer.logger.version}' not in result_root :  
+    result_root = os.path.join(trainer.log_dir, 'lightning_logs', f'version_{trainer.logger.version}')
 
 dataset_generators_result = []
 skip_if_nan = True
