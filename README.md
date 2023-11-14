@@ -18,6 +18,8 @@ version 1.9 of lightning due to parsing issues with higher versions
 ```
 mamba create -n mlrep pytorch-lightning=1.9 pytorch tqdm pandas pytest pytest-cov
 mamba activate mlrep
+git clone https://github.com/organic-chemistry/mlrep.git
+cd mlrep
 pip install -e ./
 ```
 

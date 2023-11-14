@@ -2,6 +2,7 @@
 import torch
 import random
 import numpy as np
+import math
 
 class RandomFileIterator(torch.utils.data.IterableDataset):
     """
@@ -41,8 +42,23 @@ class MyIterableDataset(torch.utils.data.IterableDataset):
          super(MyIterableDataset).__init__()
          self.list_dataset = list_dataset
      def __iter__(self):
-        return RandomFileIterator([iter(ds) for ds in self.list_dataset])
-     
+        worker_info = torch.utils.data.get_worker_info()
+        if worker_info != None and (worker_info.num_workers> len(self.list_dataset)):
+            print(f"Num workers should be less that the number of dataset ({len(self.list_dataset)})")
+            raise
+        if worker_info is None:  # single-process data loading, return the full iterator
+            iter_start = 0
+            iter_end = len(self.list_dataset)
+        else:  # in a worker process
+            # split workload
+            per_worker = int(math.ceil(len(self.list_dataset) / float(worker_info.num_workers)))
+            worker_id = worker_info.id
+            iter_start = worker_id * per_worker
+            iter_end = min(iter_start + per_worker, len(self.list_dataset))
+        #print(iter_start,iter_end,len(self.list_dataset))
+        return RandomFileIterator([iter(ds) for ds in self.list_dataset[iter_start:iter_end]])
+
+
 
 class PaddedArrayView:
     #Array to avoid the explicit concatanation

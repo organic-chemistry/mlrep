@@ -9,7 +9,7 @@ from torch.utils.data import DataLoader
 
 from pytorch_lightning.callbacks.early_stopping import EarlyStopping
 import pytorch_lightning as pl
-
+from pytorch_lightning.loggers import CSVLogger
 
 from mlrep.LightModule import LightMod
 from mlrep.models.CNN import VariableCNN1D
@@ -25,6 +25,7 @@ parser.add_argument("--window_size", type=int,default=101)
 parser.add_argument("--batch_size", type=int,default=32)
 parser.add_argument("--patience", type=int,default=4)
 parser.add_argument("--layers_dim",nargs='+', type=int,default=[21, 41, 61])
+parser.add_argument("--num_workers", type=int,default=1)
 
 
 parser.add_argument("--inputs",nargs='+' , type=list,default=["H3K4me1","H3K4me3","H3K27me3",
@@ -75,7 +76,7 @@ for file in list_files:
             dataset_generators_validation.append(data_set)
 
 
-data_train = DataLoader( MyIterableDataset(dataset_generators_train), batch_size=batch_size)
+data_train = DataLoader( MyIterableDataset(dataset_generators_train), batch_size=batch_size,num_workers=args.num_workers)
 data_validation = DataLoader( MyIterableDataset(dataset_generators_validation), batch_size=batch_size)
 
 
@@ -125,7 +126,8 @@ print(model)
 
 lightning_model = LightMod(model=model)
 
-trainer =  pl.Trainer.from_argparse_args(args, callbacks=[EarlyStopping(monitor="validation_loss",
+CSVlog = CSVLogger(args.default_root_dir)
+trainer =  pl.Trainer.from_argparse_args(args,logger=CSVlog ,callbacks=[EarlyStopping(monitor="validation_loss",
                                                                          mode="min",patience=patience)])
 
 

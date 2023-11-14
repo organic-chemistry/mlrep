@@ -9,7 +9,7 @@ class VariableCNN1D(nn.Module):
         super(VariableCNN1D, self).__init__()
         
 
-        self.bn = nn.BatchNorm1d(input_size)
+        #self.bn = nn.BatchNorm1d(input_size)
 
         self.layers = nn.ModuleList()
         
@@ -35,7 +35,7 @@ class VariableCNN1D(nn.Module):
 
     def forward(self, x):
         out = x.permute(0, 2, 1)
-        out = self.bn(out)
+        #out = self.bn(out)
         for layer in self.layers:
             out = layer(out)
         out = out.view(out.size(0), -1)
