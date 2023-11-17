@@ -5,11 +5,8 @@ import torch.nn.functional as Fun
 
 
 class VariableCNN1D(nn.Module):
-    def __init__(self, input_size, num_classes, window_size, layer_dims, conv_kernel_size=5, max_pool_kernel_size=2):
+    def __init__(self, input_size, num_classes, window_size, layer_dims, conv_kernel_size=5, max_pool_kernel_size=2,drop_out=0.01):
         super(VariableCNN1D, self).__init__()
-        
-
-        #self.bn = nn.BatchNorm1d(input_size)
 
         self.layers = nn.ModuleList()
         
@@ -19,6 +16,8 @@ class VariableCNN1D(nn.Module):
             conv_layer = nn.Sequential(
                 nn.Conv1d(in_channels, out_channels, kernel_size=conv_kernel_size),
                 nn.ReLU(),
+                nn.Dropout1d(p=drop_out)
+                #nn.BatchNorm1d(out_channels)
             )
             self.layers.append(conv_layer)
             in_channels = out_channels
@@ -33,14 +32,14 @@ class VariableCNN1D(nn.Module):
             temp_input = layer(temp_input)
         return temp_input.view(1, -1).size(1)
 
-    def forward(self, x):
+    def forward(self, x,logit=False):
         out = x.permute(0, 2, 1)
-        #out = self.bn(out)
         for layer in self.layers:
             out = layer(out)
         out = out.view(out.size(0), -1)
         out = self.fc(out)
-        out = Fun.sigmoid(out)
+        if not logit:
+            out = Fun.sigmoid(out)
         return out
 
 

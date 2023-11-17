@@ -26,6 +26,7 @@ parser.add_argument("--batch_size", type=int,default=32)
 parser.add_argument("--patience", type=int,default=4)
 parser.add_argument("--layers_dim",nargs='+', type=int,default=[21, 41, 61])
 parser.add_argument("--num_workers", type=int,default=1)
+parser.add_argument("--loss", type=str,default="cross_entropy",choices=["mse","cross_entropy"])
 
 
 parser.add_argument("--inputs",nargs='+' , type=list,default=["H3K4me1","H3K4me3","H3K27me3",
@@ -38,6 +39,9 @@ parser = pl.Trainer.add_argparse_args(parser)
 #parser = LightMod.add_model_specific_args(parser)
 
 args = parser.parse_args()
+
+#Torch specific option
+torch.set_float32_matmul_precision('medium')
 
 
 window_size = args.window_size
@@ -124,7 +128,7 @@ model = VariableCNN1D(input_size, num_classes, window_size=window_size, layer_di
 
 print(model)
 
-lightning_model = LightMod(model=model)
+lightning_model = LightMod(model=model,loss=args.loss)
 
 CSVlog = CSVLogger(args.default_root_dir)
 trainer =  pl.Trainer.from_argparse_args(args,logger=CSVlog ,callbacks=[EarlyStopping(monitor="validation_loss",

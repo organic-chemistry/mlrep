@@ -34,6 +34,11 @@ It with create a log directory in test/lightning_logs/version_1/ with version ch
 Inside you can find the metrics, the parameters as well as the checkpoints and the prediction of the model
 There is an example [notebook](notebook/check_results.ipynb) to view the results and the loss Notebook Link 
 
+On gpu:
+```
+ython scripts/train.py --devices gpus --gpus 1 --layers_dim 10 20 40 --patience 5 --max_epochs 100 --window_size 101 --batch_size 128 --data data/K562_2000_merged_histones_init.csv.gz  --default_root_dir test/ --num_workers 10
+```
+
 ## Running the test
 I implemented some test for the iterators
 You can run them like that:
