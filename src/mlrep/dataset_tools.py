@@ -43,18 +43,25 @@ class MyIterableDataset(torch.utils.data.IterableDataset):
          self.list_dataset = list_dataset
      def __iter__(self):
         worker_info = torch.utils.data.get_worker_info()
-        if worker_info != None and (worker_info.num_workers> len(self.list_dataset)):
-            print(f"Num workers should be less that the number of dataset ({len(self.list_dataset)})")
-            raise
+     
         if worker_info is None:  # single-process data loading, return the full iterator
             iter_start = 0
             iter_end = len(self.list_dataset)
         else:  # in a worker process
             # split workload
-            per_worker = int(math.ceil(len(self.list_dataset) / float(worker_info.num_workers)))
-            worker_id = worker_info.id
-            iter_start = worker_id * per_worker
-            iter_end = min(iter_start + per_worker, len(self.list_dataset))
+            #print(worker_info.num_workers)
+            if worker_info.num_workers == 1:
+                iter_start = 0
+                iter_end = len(self.list_dataset)
+
+            elif worker_info != None and (worker_info.num_workers> len(self.list_dataset)):
+                print(f"Num workers should be less that the number of dataset ({len(self.list_dataset)})")
+                raise
+            if worker_info.num_workers != 1:
+                per_worker = np.array_split(np.arange(len(self.list_dataset)),worker_info.num_workers)
+                worker_id = worker_info.id
+                iter_start = per_worker[worker_id][0]
+                iter_end = per_worker[worker_id][-1] + 1
         #print(iter_start,iter_end,len(self.list_dataset))
         return RandomFileIterator([iter(ds) for ds in self.list_dataset[iter_start:iter_end]])
 

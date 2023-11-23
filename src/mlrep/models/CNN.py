@@ -1,17 +1,25 @@
 import torch
 import torch.nn as nn
 import torch.nn.functional as Fun
+import lightning.pytorch as pl
 
 
 
 class VariableCNN1D(nn.Module):
-    def __init__(self, input_size, num_classes, window_size, layer_dims, conv_kernel_size=5, max_pool_kernel_size=2,drop_out=0.01):
-        super(VariableCNN1D, self).__init__()
+    def __init__(self, input_dim=11, 
+                       num_classes=1, 
+                       window_size=101,
+                       layer_dims = [21, 41, 61],
+                       conv_kernel_size=5, 
+                       max_pool_kernel_size=2,
+                       drop_out=0.01):
+        
+        super().__init__()
 
         self.layers = nn.ModuleList()
         
         # Create convolutional layers based on layer_dims
-        in_channels = input_size
+        in_channels = input_dim
         for out_channels in layer_dims:
             conv_layer = nn.Sequential(
                 nn.Conv1d(in_channels, out_channels, kernel_size=conv_kernel_size),
@@ -23,7 +31,7 @@ class VariableCNN1D(nn.Module):
             in_channels = out_channels
         self.layers.append(nn.MaxPool1d(kernel_size=max_pool_kernel_size))
         
-        self.fc = nn.Linear(self.calculate_flatten_size( input_size, window_size), num_classes)
+        self.fc = nn.Linear(self.calculate_flatten_size( input_dim, window_size), num_classes)
 
     def calculate_flatten_size(self, input_size, window_size):
         # Create a temporary tensor to compute the size

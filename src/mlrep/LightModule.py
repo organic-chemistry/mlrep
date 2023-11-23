@@ -1,25 +1,21 @@
-import pytorch_lightning as pl
 from torch import optim
 import torch.nn.functional as Fun
 import torch.nn as nn
 import torch
+import lightning as L
 
-class LightMod(pl.LightningModule):
+class LightMod(L.LightningModule):
     def __init__(self,
                 model: nn.Module,
-                loss: str):
+                loss = "cross_entropy",
+                patience=3):
                 #optim: Partial[Optimizer]):
         super().__init__()
         #self.save_hyperparameters()
         self.model = model
         self.loss = loss
+        self.patience=patience
 
-    #@staticmethod
-    #def add_model_specific_args(parent_parser):
-    #    parser = parent_parser.add_argument_group("LitModel")
-    #    parser.add_argument("--num_features", type=int, default=8)
-    #    parser.add_argument("--kernel_size", type=int, default=3)
-    #    return parent_parser
 
     def step(self,batch,batch_idx,log):
         x, y = batch
@@ -41,12 +37,14 @@ class LightMod(pl.LightningModule):
     def training_step(self, batch, batch_idx):
         return self.step(batch,batch_idx,"training_loss")
     def validation_step(self, batch, batch_idx):
-        return self.step(batch,batch_idx,"validation_loss")
+        return self.step(batch,batch_idx,"val_loss")
     def test_step(self, batch, batch_idx):
         return self.step(batch,batch_idx,"test_loss")
 
     def configure_optimizers(self):
         optimizer = optim.Adadelta(self.parameters())
-        lr_scheduler = {"scheduler":torch.optim.lr_scheduler.ReduceLROnPlateau(optimizer,patience=3 , min_lr = 0.1,factor=0.5),
-                        "monitor":"validation_loss"}
-        return [optimizer] , [lr_scheduler]
+        lr_scheduler = {"scheduler":torch.optim.lr_scheduler.ReduceLROnPlateau(optimizer,
+                                                                               patience=self.patience ,
+                                                                               min_lr = 0.01,factor=0.5),
+                        "monitor":"val_loss"}
+        return [optimizer], [lr_scheduler]
